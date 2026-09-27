@@ -1,0 +1,259 @@
+Automata Vákuumos Táblatörlő Auto
+Hardverspecifikáció és Rendszerterv
+1. A Rendszer Fizikai Alapelvei
+A táblán (függőleges, rendkívül alacsony súrlódású felületen) való mozgás alapvető feltétele,
+hogy a kerekek súrlódási ereje meghaladja a robot teljes súlyát.
+
+ ●​ Képlet:
+
+ ●​ Ahol a a tapadási tényező (ezt maximalizáljuk puha szilikonnal), az        pedig a
+    vákuum által generált szívóerő.
+ ●​ Mérnöki cél: A robot súlyának minimalizálása, a kerekek tapadásának maximalizálása, és
+
+    magas statikus nyomáskülönbség (         ) létrehozása a robot alatti kamrában. Emiatt a
+    vezeték nélküli töltést (MagSafe) elvetettük a magas súly és hőtermelés miatt, helyette
+    100%-os hatásfokú, pehelysúlyú fizikai kontaktusos (Pogo pin) dokkolást alkalmazunk.
+
+2. Felhasznált Alkatrészek, Paraméterek és Indoklás
+
+ Alkatrész           Típus /            Fizikai /           Becsült Súly       Becsült Ár
+                     Paraméterek        Mérnöki
+                                        Indoklás
+
+
+ Mikrokontroll       ESP32-S3           Könnyű, erős,       ~10 g              Meglévő (0 Ft)
+ er                  (3.3V logika,      rugalmas PWM
+                     beépített          kiosztással
+                     Wi-Fi/BT)          rendelkezik. A
+                                        Wi-Fi/BT
+                                        hasznos a
+                                        teszteléshez és
+                                        az okosotthon
+                                        integrációhoz.
+
+ Kerekek (4          JSumo Mini         A tábla felülete    ~30 g              8 000 Ft
+ db)                 Sumo szilikon      csúszós. Csak
+                     kerekek            a legpuhább
+                     (Shore 20A         (ragadós)
+                     keménység,         szilikon biztosít
+                     alu agy)           elég tapadást (
+
+                                          ). Az
+                               alumínium agy
+                               garantálja,
+                               hogy a vákuum
+                               hatalmas
+                               nyomóereje
+                               alatt sem
+                               deformálódik a
+                               kerék.
+
+Vákuummotor   Mikro BLDC       Axiális PC         ~60 g   8 000 Ft
+              porszívó         ventilátor nem
+              motor (vagy      tud elég
+              30-40mm EDF,     statikus
+              30 000+ RPM)
+                               nyomást (
+                               ) generálni. A
+                               centrifugális
+                               kefe nélküli
+                               motor könnyű,
+                               kiszívja a
+                               levegőt, és
+                               folyamatos
+                               negatív
+                               nyomást tart
+                               fenn.
+
+Meghajtó      N20 DC           A vákuum           ~20 g   5 000 Ft
+motorok (2    mikromotor       miatt a robotot
+db)           fém áttétellel   hatalmas erő
+              (100:1 vagy      nyomja a
+              300:1, 6V)       táblához, ami
+                               növeli a
+                               gördülési
+                               ellenállást.
+                               Nem
+                               sebességre,
+                               hanem óriási
+                               nyomatékra
+                               van szükség,
+                               amit a fém
+                               áttétel biztosít
+                               minimális súly
+                               mellett.
+Törlőmotor     Extra N20 DC     A mikroszálas      ~10 g   2 000 Ft
+               motor (vagy      henger
+               könnyű 5V DC)    forgatásához.
+                                Könnyű, a
+                                célnak
+                                megfelelő
+                                nyomatékkal.
+
+Akkumulátor    2S LiPo (7.4V,   A BLDC motor       ~40 g   5 000 Ft
+               ~500 mAh,        induláskor
+               30C+ kisütési    5-15A áramot
+               ráta)            vesz fel. A LiPo
+                                (drón akku)
+                                energiasűrűsé
+                                ge a
+                                legmagasabb
+                                (Wh/kg), és
+                                képes hirtelen
+                                nagy áramot
+                                leadni,
+                                ellentétben a
+                                nehéz
+                                18650-es
+                                cellákkal.
+
+Vákuum         BLHeli ESC       A kefe nélküli     ~10 g   4 000 Ft
+motorvezérlő   (20A-30A,        BLDC motorok
+               BEC-cel)         3 fázisú áramot
+                                igényelnek,
+                                amit a
+                                mikrokontroller
+                                nem tud
+                                előállítani. Az
+                                ESC PWM jelet
+                                alakít át 3
+                                fázisú
+                                meghajtássá.
+
+Meghajtó       TB6612FNG        Sokkal kisebb,     ~5 g    2 000 Ft
+motorvezérlő   H-híd (1.2A      könnyebb és
+               folyamatos /     hatékonyabb
+               csatorna)        (kisebb a
+                               feszültségesés
+                               ), mint az
+                               elavult L298N.
+                               Két N20-as
+                               motort tud
+                               függetlenül
+                               vezérelni (tank
+                               irányítás).
+
+Törlő          D4184           Az egyszerű       ~5 g    1 000 Ft
+motorvezérlő   MOSFET          harmadik
+               modul           motor
+               (N-csatornás)   be/kikapcsolás
+                               ára és
+                               fordulatszámá
+                               nak PWM alapú
+                               szabályozására
+                               a legkisebb és
+                               legkönnyebb
+                               megoldás.
+
+Peremérzékel   TCRT5000 IR     Képes             ~15 g   2 000 Ft
+ők (4 db)      reflexiós       érzékelni a
+               modul           tábla keretét
+                               (szín/távolság
+                               különbség), így
+                               megakadályoz
+                               za, hogy a
+                               robot
+                               vákuumot
+                               veszítve
+                               lezuhanjon a
+                               szélén.
+
+Töltő          Pogo pins       100%-os           ~5 g    1 500 Ft
+érintkezők     (rugós tűk) +   energiaátviteli
+               réz lapkák      hatásfok, nincs
+                               hőtermelés,
+                               súlya szinte
+                               nulla. Sokkal
+                               jobb
+                               alternatíva a
+                                       falmászó
+                                       robotoknál,
+                                       mint a nehéz
+                                       MagSafe
+                                       tekercsek.
+
+ Vákuum             1-2 mm             Lezárja a rést a   ~10 g               1 500 Ft
+ szoknya            vékony             robot és a
+                    neoprén/szilik     tábla között,
+                    on lap             biztosítva a
+                                       vákuumkamra
+                                       szivárgásment
+                                       ességét, de
+                                       nem növeli
+                                       drasztikusan a
+                                       súrlódást.
+
+ Törlő              Mikroszálas        A száraz           ~5 g                -
+                    kendő              filcport
+                    (tépőzárral a      kapilláris és
+                    hengeren)          elektrosztatiku
+                                       s úton gyűjti
+                                       össze. Nem
+                                       igényel nagy
+                                       rányomási
+                                       erőt,
+                                       ellentétben a
+                                       szivaccsal.
+
+
+Összesített becsült elektronikai súly: ~225 gramm (+ a 3D nyomtatott váz)
+
+Összesített becsült költség: ~40 000 Ft
+
+3. Elektronikai Bekötési Terv (ESP32-S3 alapokon)
+Figyelem: A rendszernek egyetlen közös Föld (GND) hálózattal kell rendelkeznie!
+
+A. Tápellátás Logika
+ 1.​ Akkumulátor (7.4V): Közvetlenül táplálja az ESC-t és a TB6612FNG motorvezérlő VM
+     (Motor Power) pinjét.
+ 2.​ ESP32-S3 táp: Az ESC szervókábelén lévő BEC (Battery Eliminator Circuit) 5V-ot biztosít.
+     Ezt kell az ESP32 5V (vagy VIN) lábára kötni.
+ 3.​ Logikai táp (3.3V): Az ESP32-S3 3.3V kimenete látja el árammal a TB6612FNG VCC pinjét
+    és az összes TCRT5000 szenzor VCC pinjét. (5V-ot tilos a szenzorokra kötni!)
+B. Motorvezérlés (TB6612FNG - Kerekek)
+
+ TB6612FNG Pin                  ESP32-S3 Láb                    Funkció
+
+
+ PWMA                           GPIO 4                          Bal motor sebesség (PWM)
+
+ AIN1 / AIN2                    GPIO 5 / GPIO 6                 Bal motor irány
+
+ PWMB                           GPIO 7                          Jobb motor sebesség
+                                                                (PWM)
+
+ BIN1 / BIN2                    GPIO 15 / GPIO 16               Jobb motor irány
+
+ STBY                           3.3V (folyamatos)               Modul engedélyezése
+
+
+C. Vákuum és Törlő mechanika
+
+ Eszköz / Pin                   ESP32-S3 Láb                    Funkció
+
+
+ ESC Jel (Sárga/Fehér)          GPIO 8                          Vákuummotor vezérlése
+                                                                (Szervo PWM: 1000-2000
+                                                                µs)
+
+ MOSFET PWM bemenet             GPIO 21                         Törlőmotor sebességének
+                                                                szabályozása
+
+
+D. Peremérzékelők (TCRT5000 Digitális kimenet)
+
+ Szenzor Elhelyezkedés          ESP32-S3 Láb                    Funkció
+
+
+ Bal Felső (DO)                 GPIO 17                         Távolság/Keret megszakítás
+                                                                érzékelése
+
+ Jobb Felső (DO)                GPIO 18                         Távolság/Keret megszakítás
+                                                                érzékelése
+
+ Bal Alsó (DO)                  GPIO 19                         Távolság/Keret megszakítás
+                                                                érzékelése
+
+ Jobb Alsó (DO)                 GPIO 20                         Távolság/Keret megszakítás
+érzékelése
+

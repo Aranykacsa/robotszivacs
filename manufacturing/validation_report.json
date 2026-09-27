@@ -1,0 +1,223 @@
+{
+  "printed_parts": [
+    {
+      "name": "Chassis",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 106204.58
+    },
+    {
+      "name": "Vacuum_Adapter",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 11025.0
+    },
+    {
+      "name": "EDF_Duct_Clamp",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 6551.49
+    },
+    {
+      "name": "Motor_Clamp_Left_Front",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 1811.16
+    },
+    {
+      "name": "Motor_Clamp_Left_Rear",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 1811.16
+    },
+    {
+      "name": "Motor_Clamp_Right_Front",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 1811.16
+    },
+    {
+      "name": "Motor_Clamp_Right_Rear",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 1811.16
+    },
+    {
+      "name": "Roller_Core",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 20124.17
+    },
+    {
+      "name": "Bearing_Retainer_Left",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 602.69
+    },
+    {
+      "name": "Bearing_Retainer_Right",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 602.69
+    },
+    {
+      "name": "Roller_Shaft_Coupling",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 1175.31
+    },
+    {
+      "name": "Wiper_Motor_Clamp",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 1811.16
+    },
+    {
+      "name": "Battery_2S_LiPo_Tray",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 5779.23
+    },
+    {
+      "name": "ESP32_S3_Tray",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 5343.23
+    },
+    {
+      "name": "BLHeli_ESC_Tray",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 1637.72
+    },
+    {
+      "name": "TB6612FNG_Tray",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 1945.21
+    },
+    {
+      "name": "D4184_MOSFET_Tray",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 2556.17
+    },
+    {
+      "name": "Sensor_Cartridge_Left_Front",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 2163.92
+    },
+    {
+      "name": "Sensor_Height_Shim_Left_Front",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 305.25
+    },
+    {
+      "name": "Sensor_Edge_Clamp_Left_Front",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 671.44
+    },
+    {
+      "name": "Sensor_Cartridge_Left_Rear",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 2163.92
+    },
+    {
+      "name": "Sensor_Height_Shim_Left_Rear",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 305.25
+    },
+    {
+      "name": "Sensor_Edge_Clamp_Left_Rear",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 671.44
+    },
+    {
+      "name": "Sensor_Cartridge_Right_Front",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 2163.92
+    },
+    {
+      "name": "Sensor_Height_Shim_Right_Front",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 305.25
+    },
+    {
+      "name": "Sensor_Edge_Clamp_Right_Front",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 671.44
+    },
+    {
+      "name": "Sensor_Cartridge_Right_Rear",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 2163.92
+    },
+    {
+      "name": "Sensor_Height_Shim_Right_Rear",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 305.25
+    },
+    {
+      "name": "Sensor_Edge_Clamp_Right_Rear",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 671.44
+    },
+    {
+      "name": "Charging_Contact_Block",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 2541.39
+    },
+    {
+      "name": "Sports_Car_Service_Cover",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 69107.44
+    },
+    {
+      "name": "Exhaust_Grille",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 1490.75
+    }
+  ],
+  "cut_parts": [
+    {
+      "name": "Full_Bottom_Sponge",
+      "nonmanifold_edges": 0,
+      "connected_solids": 1,
+      "solid_volume_mm3": 50034.26
+    }
+  ],
+  "checks": [
+    "Connected manifold printable solids",
+    "Four 6 V drive motors",
+    "Direct chassis parenting",
+    "Applied scale",
+    "Open vacuum path through pad/chassis/adapter/EDF",
+    "Shared wheel/motor axes",
+    "Wheel and roller board contact",
+    "Four unobstructed downward optical rays at 2.5 mm",
+    "Cover/purchased-component surface interference check"
+  ],
+  "status": "PROTOTYPE \u2014 purchased-part fit unverified",
+  "specified_mass_g": 296.8,
+  "limits": [
+    "Not pressure/flow or adhesion validated",
+    "EDF duct bore/length and N20 shaft geometry require measurement",
+    "Fit coupon and actual part measurements required",
+    "No claim of full assembly interference certification"
+  ]
+}

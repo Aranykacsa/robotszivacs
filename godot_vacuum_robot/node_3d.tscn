@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://b7finsvmom5j4"]
+
+[ext_resource type="PackedScene" uid="uid://nw2mumktb6ln" path="res://Vacuum_Robot_Blockout.glb" id="1_a202f"]
+
+[node name="Node3D" type="Node3D" unique_id=363320684]
+
+[node name="Vacuum_Robot_Blockout" parent="." unique_id=669494904 instance=ExtResource("1_a202f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.05949375, 0, -0.044999838)
