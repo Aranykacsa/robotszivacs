@@ -7,9 +7,11 @@ const BOARD_CENTER := Vector3(0.0, 2.35, -1.45)
 const BATTERY_SECONDS := 60.0
 const DRIVE_SPEED := 0.32
 const TURN_SPEED := 2.1
-const DOCK_POSITION := Vector3(0.91, 0.015, 0.68)
+const DOCK_POSITION := Vector3(1.098, 0.015, 0.661)
+const DOCK_HEADING := PI # charger is turned 180° toward the board interior
 const POGO_TIP_FORWARD := 0.1041
 const POGO_LATERAL_SPACING := 0.032
+const UI_REFRESH_INTERVAL := 0.1
 
 var board_root: Node3D
 var robot: Node3D
@@ -29,15 +31,22 @@ var clean_bar: ProgressBar
 var dock_material: StandardMaterial3D
 var dock_light: OmniLight3D
 var elapsed := 0.0
+var ui_refresh_elapsed := 0.0
+var low_performance_mode := false
+var key_light: DirectionalLight3D
+var robot_shadow_casters: Array[GeometryInstance3D] = []
 
 func _ready() -> void:
 	_build_classroom()
+	key_light = get_node_or_null("KeyLight") as DirectionalLight3D
+	Engine.max_fps = 60
 	_build_wall_board()
 	_build_dock()
 	robot = ROBOT_SCENE.instantiate() as Node3D
 	robot.name = "Whiteboard Robot"
 	robot.position = Vector3(0.0, 0.015, 0.08)
 	board_root.add_child(robot)
+	_optimize_robot_shadows()
 	_build_camera()
 	_build_hud()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -71,19 +80,7 @@ func _build_classroom() -> void:
 	sign.modulate = Color(0.40, 1.0, 0.88)
 	sign.position = Vector3(-3.9, 4.55, -1.53)
 	add_child(sign)
-	var key := DirectionalLight3D.new()
-	key.name = "Classroom Key Light"
-	key.rotation_degrees = Vector3(-35, -24, 0)
-	key.light_color = Color(1.0, 0.91, 0.76)
-	key.light_energy = 1.15
-	key.shadow_enabled = true
-	add_child(key)
-	var fill := OmniLight3D.new()
-	fill.position = Vector3(0, 4.7, 2.0)
-	fill.light_color = Color(0.52, 0.86, 1.0)
-	fill.light_energy = 0.85
-	fill.omni_range = 8.0
-	add_child(fill)
+	# The scene's shared key and fill lights illuminate the room; avoid adding duplicates here.
 
 func _build_wall_board() -> void:
 	board_root = Node3D.new()
@@ -171,11 +168,11 @@ func _build_lorem_text() -> void:
 			word_index += 1
 
 func _build_dock() -> void:
-	# Robot pins sit at x = +/-16 mm and extend 104.1 mm forward from its root.
-	# The charger face is therefore placed exactly at the pin-tip plane when parked.
-	var face_z := DOCK_POSITION.z - POGO_TIP_FORWARD
+	# The robot faces inward from the corner. Its pins extend along +board-Z at this heading.
+	# The charger face sits on the inward edge; its body reaches the board's outer corner.
+	var face_z := DOCK_POSITION.z + POGO_TIP_FORWARD
 	var dock := _box("Pogo Pin Charging Station", Vector3(0.19, 0.050, 0.13),
-		Vector3(DOCK_POSITION.x, 0.039, face_z - 0.065), Color(0.055, 0.12, 0.16), 0.55, 0.28)
+		Vector3(DOCK_POSITION.x, 0.039, face_z + 0.065), Color(0.055, 0.12, 0.16), 0.55, 0.28)
 	dock_material = StandardMaterial3D.new()
 	dock_material.albedo_color = Color(0.08, 0.52, 0.32)
 	dock_material.emission_enabled = true
@@ -184,12 +181,12 @@ func _build_dock() -> void:
 	board_root.add_child(dock)
 	for side in [-1.0, 1.0]:
 		var guide := _box("Dock Nose Guide", Vector3(0.012, 0.046, 0.13),
-			Vector3(DOCK_POSITION.x + side * 0.095, 0.044, face_z - 0.065), Color(0.10, 0.26, 0.31), 0.65, 0.25)
+			Vector3(DOCK_POSITION.x + side * 0.095, 0.044, face_z + 0.065), Color(0.10, 0.26, 0.31), 0.65, 0.25)
 		board_root.add_child(guide)
 	for side in [-1.0, 1.0]:
 		var contact := _box("Dock Copper Contact %s" % ("L" if side < 0 else "R"),
 			Vector3(0.012, 0.018, 0.004),
-			Vector3(DOCK_POSITION.x + side * POGO_LATERAL_SPACING / 2.0, DOCK_POSITION.y + 0.0095, face_z - 0.002),
+			Vector3(DOCK_POSITION.x + side * POGO_LATERAL_SPACING / 2.0, DOCK_POSITION.y + 0.0095, face_z + 0.002),
 			Color(0.96, 0.57, 0.16), 0.86, 0.20)
 		board_root.add_child(contact)
 	var label := Label3D.new()
@@ -203,7 +200,7 @@ func _build_dock() -> void:
 	board_root.add_child(label)
 	dock_light = OmniLight3D.new()
 	dock_light.name = "Dock Status Light"
-	dock_light.position = BOARD_CENTER + board_root.basis * Vector3(DOCK_POSITION.x, 0.09, face_z - 0.065)
+	dock_light.position = BOARD_CENTER + board_root.basis * Vector3(DOCK_POSITION.x, 0.09, face_z + 0.065)
 	dock_light.light_color = Color(0.1, 1.0, 0.45)
 	dock_light.light_energy = 0.4
 	dock_light.omni_range = 0.55
@@ -260,7 +257,7 @@ func _build_hud() -> void:
 	clean_bar = _make_bar(Color(0.14, 0.82, 0.92))
 	column.add_child(clean_bar)
 	var controls := Label.new()
-	controls.text = "W/S drive   A/D steer   HOME parallel park + charge   R reset"
+	controls.text = "W/S drive   A/D steer   HOME park + charge   F10 low power   R reset"
 	controls.add_theme_color_override("font_color", Color(0.70, 0.77, 0.88))
 	controls.add_theme_font_size_override("font_size", 12)
 	column.add_child(controls)
@@ -288,6 +285,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		parking_phase = 0
 	if event.keycode == KEY_R:
 		get_tree().reload_current_scene()
+	if event.keycode == KEY_F10:
+		_set_low_performance_mode(not low_performance_mode)
 	if event.keycode == KEY_F11:
 		var mode := DisplayServer.window_get_mode()
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if mode == DisplayServer.WINDOW_MODE_FULLSCREEN else DisplayServer.WINDOW_MODE_FULLSCREEN)
@@ -305,8 +304,36 @@ func _physics_process(delta: float) -> void:
 		battery_seconds = maxf(0.0, battery_seconds - delta)
 		if battery_seconds <= 0.0:
 			_start_fall()
-	_update_cleaning()
-	_update_hud(delta)
+	ui_refresh_elapsed += delta
+	if ui_refresh_elapsed >= UI_REFRESH_INTERVAL:
+		var refresh_delta := ui_refresh_elapsed
+		ui_refresh_elapsed = 0.0
+		_update_cleaning()
+		_update_hud(refresh_delta)
+
+func _optimize_robot_shadows() -> void:
+	# Tiny fasteners, sensors, and board electronics add many shadow draw calls but
+	# do not change the robot's silhouette. Keep shadows on the larger visible parts.
+	var pending: Array[Node] = [robot]
+	while not pending.is_empty():
+		var parent: Node = pending.pop_back()
+		for child in parent.get_children():
+			pending.append(child)
+			if child is MeshInstance3D and child.mesh != null:
+				var bounds: Vector3 = child.mesh.get_aabb().size * child.scale
+				if maxf(bounds.x, maxf(bounds.y, bounds.z)) < 0.015:
+					child.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				else:
+					robot_shadow_casters.append(child)
+
+func _set_low_performance_mode(enabled: bool) -> void:
+	low_performance_mode = enabled
+	Engine.max_fps = 30 if enabled else 60
+	if key_light != null:
+		key_light.shadow_enabled = not enabled
+	for mesh_instance in robot_shadow_casters:
+		if is_instance_valid(mesh_instance):
+			mesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF if enabled else GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 
 func _update_player_drive(delta: float) -> void:
 	var throttle := float(Input.is_physical_key_pressed(KEY_W)) - float(Input.is_physical_key_pressed(KEY_S))
@@ -319,8 +346,8 @@ func _update_player_drive(delta: float) -> void:
 
 func _update_return_drive(delta: float) -> void:
 	var y := robot.position.y
-	var approach := Vector3(DOCK_POSITION.x - 0.22, y, DOCK_POSITION.z + 0.16)
-	var align := Vector3(DOCK_POSITION.x, y, DOCK_POSITION.z + 0.16)
+	var approach := Vector3(DOCK_POSITION.x - 0.22, y, DOCK_POSITION.z - 0.16)
+	var align := Vector3(DOCK_POSITION.x, y, DOCK_POSITION.z - 0.16)
 	match parking_phase:
 		0:
 			if _drive_toward(approach, delta):
@@ -329,13 +356,13 @@ func _update_return_drive(delta: float) -> void:
 			if _drive_toward(align, delta):
 				parking_phase = 2
 		2:
-			_rotate_robot_toward(0.0, delta) # point the front pogo pins into the charger face
-			if absf(wrapf(robot.rotation.y, -PI, PI)) < 0.035:
+			_rotate_robot_toward(DOCK_HEADING, delta) # point the front pogo pins into the charger face
+			if absf(wrapf(robot.rotation.y - DOCK_HEADING, -PI, PI)) < 0.035:
 				parking_phase = 3
 		3:
 			if _drive_toward(DOCK_POSITION, delta):
 				robot.position = DOCK_POSITION
-				robot.rotation.y = 0.0
+				robot.rotation.y = DOCK_HEADING
 				returning_to_dock = false
 				charging = true
 	if not returning_to_dock:
@@ -410,9 +437,10 @@ func _update_hud(delta: float) -> void:
 		dock_light.light_energy = 0.4 + pulse * (1.5 if docked else 0.25)
 
 func _pogo_contacts_mated() -> bool:
-	var face_z := DOCK_POSITION.z - POGO_TIP_FORWARD
+	var face_z := DOCK_POSITION.z + POGO_TIP_FORWARD
 	for side in [-1.0, 1.0]:
-		var pin_tip := robot.to_global(Vector3(side * POGO_LATERAL_SPACING / 2.0, 0.0095, -POGO_TIP_FORWARD))
+		# A 180° heading swaps the left/right pin positions in board-local X.
+		var pin_tip := robot.to_global(Vector3(-side * POGO_LATERAL_SPACING / 2.0, 0.0095, -POGO_TIP_FORWARD))
 		var pad_face := board_root.to_global(Vector3(DOCK_POSITION.x + side * POGO_LATERAL_SPACING / 2.0, DOCK_POSITION.y + 0.0095, face_z))
 		if pin_tip.distance_to(pad_face) > 0.004:
 			return false

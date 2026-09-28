@@ -1047,6 +1047,8 @@ current = true
 def create_godot_project(directory, executable=None, skip=False):
     """Write a Godot 4 project, then import and smoke-run it with OS subprocesses."""
     directory.mkdir(parents=True, exist_ok=True)
+    log_directory = directory/'logs'
+    log_directory.mkdir(exist_ok=True)
     files = {'project.godot': '''config_version=5
 [application]
 config/name="Vacuum Robot Inspection"
@@ -1069,9 +1071,9 @@ renderer/rendering_method.mobile="gl_compatibility"
         result = subprocess.run([binary,'--headless','--path',str(directory),*args],
                                 capture_output=True, text=True, timeout=180)
         output = result.stdout + result.stderr
-        (directory/f'headless_{tag}.log').write_text(output,encoding='utf-8')
+        (log_directory/f'headless_{tag}.log').write_text(output,encoding='utf-8')
         if result.returncode or 'SCRIPT ERROR:' in output or 'ERROR:' in output:
-            raise RuntimeError(f'Godot {tag} failed; see {directory}/headless_{tag}.log')
+            raise RuntimeError(f'Godot {tag} failed; see {log_directory}/headless_{tag}.log')
         log(f'Godot headless {tag} passed ({version.stdout.strip()}).')
 
 
