@@ -12,7 +12,7 @@ The hardware PDF supplies the component families. The user subsequently confirme
 - `robot_assembled.png`, `robot_underbody.png`, `robot_service.png` — assembled, underside and cover-off views.
 - `robot_build_state.md` — flushed step-by-step component log, absolute dimensions/positions, build checks and completion status.
 - `manufacturing/` — individual prototype STLs in mm, full-pad cutting template and validation report.
-- `godot_vacuum_robot/project.godot` — true-scale static inspection scene with first-person controls.
+- `godot_vacuum_robot/project.godot` — playable whiteboard-cleaning demo built around the unchanged true-scale robot GLB.
 - [Assembly and manufacturing notes](design/ASSEMBLY.md).
 - [TCRT5000 mounting details and references](design/SENSOR_MOUNT.md).
 
@@ -44,7 +44,7 @@ These checks do not establish actual component fit, pressure/flow performance, a
 
 ## Godot and physics metadata
 
-WASD moves, mouse looks, Space jumps, Escape releases the mouse. The robot is displayed at actual scale on a table.
+The Godot project opens directly into a maximized, classroom-scale demo with Lorem Ipsum wrapped across fifteen whiteboard rows, leaving a marked lower-right docking bay. **W/S** throttle, **A/D** steer, **Home** performs a corner-parking approach and aligns the front pogo pins with two copper dock pads, and **R** resets the scene. The pad centers match the model's 32 mm pogo spacing and 104.1 mm pin reach; charging begins only when both simulated pin tips contact their pads. The robot erases text under its sponge footprint, shows cleaning progress and a one-minute battery countdown, charges while docked, and falls to the classroom floor when empty. **F11** toggles fullscreen. The robot model itself is unchanged.
 
 Each robot mesh has `Weight` in grams, `Voltage` in volts and `Part Type`. Unknown masses/ratings are `-1`; properties distinguish generic envelopes, rated motor voltage and estimated mass. Drive motors are rated **6 V**, while the battery is **7.4 V nominal**. Do not infer electrical compatibility from the visual layout.
 
